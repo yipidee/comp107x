@@ -83,19 +83,54 @@ public class DrawView extends View {
     public void drawGameBoard(Canvas canvas) {
         canvas.drawColor(Color.WHITE);     //if you want another background color
         // Draw the cannon
-        // TODO
+        cannon.draw(canvas);
 
         // Draw all the bullets
-        // TODO
+        for (int i = 0; i < bullets.size(); i++ ) {
+            if (bullets.get(i) != null) {
+                bullets.get(i).draw(canvas);
+
+                if (bullets.get(i).move() == false) {
+                    bullets.remove(i);
+                }
+            }
+        }
 
         // Draw all the explosions, at those locations where the bullet
         // hits the Android Guy
-        // TODO
+        for (int i = 0; i < explosions.size(); i++ ) {
+            if (explosions.get(i) != null) {
+                if (explosions.get(i).draw(canvas) == false) {
+                    explosions.remove(i);
+                }
+            }
+        }
 
         // If the Android Guy is falling, check to see if any of the bullets
         // hit the Guy. Draw the Android Guy
-        // TODO
+        if (androidGuy != null) {
+            androidGuy.draw(canvas);
 
+            RectF guyRect = androidGuy.getRect();
+
+            for (int i = 0; i < bullets.size(); i++ ) {
+
+                // The rectangle surrounding the Guy and Bullet intersect, then it's a collision
+                // Generate an explosion at that location and delete the Guy and bullet. Generate
+                // a new Android Guy to fall from the top.
+                if (RectF.intersects(guyRect, bullets.get(i).getRect())) {
+                    explosions.add(new Explosion(Color.RED,mContext, androidGuy.getX(), androidGuy.getY()));
+                    androidGuy.reset();
+                    bullets.remove(i);
+                    break;
+                }
+
+            }
+
+            if (androidGuy.move() == false) {
+                androidGuy = null;
+            }
+        }
     }
 
     // Move the cannon left or right
